@@ -8,10 +8,10 @@
 
 use std::collections::HashMap;
 
-use weaver_ir::data::TensorData;
-use weaver_ir::graph::Graph;
-use weaver_ir::onnx::{OnnxError, parse_onnx};
-use weaver_ir::op::OpKind;
+use gir::data::TensorData;
+use gir::graph::Graph;
+use gir::onnx::{OnnxError, parse_onnx};
+use gir::op::OpKind;
 
 // ─── Helpers ────────────────────────────────────────────────────────
 
@@ -155,6 +155,14 @@ fn parse_mini_resnet_block() {
 fn parse_resnet50_v2_7() {
     let g = parse_fixture("resnet50-v2-7.onnx");
     assert_eq!(g.parameters(), 25_595_062);
+
+    let node = g.nodes().iter().find(|n| n.name.as_deref() == Some("resnetv24_conv0_fwd"))
+        .expect("could not find first conv node");
+    let output = node.outputs[0];
+    let output = g.value_info(output)
+        .expect("could not find conv value info");
+    assert_eq!(output.name.as_deref(), Some("resnetv24_conv0_fwd"));
+    println!("shape = {}", output.shape);
 }
 
 // ─── Residual add preserves symbolic batch ──────────────────────────
@@ -190,7 +198,7 @@ fn unsupported_op_produces_error() {
 
     // Manually construct a minimal protobuf.
     let model_bytes = {
-        use weaver_ir::onnx::proto;
+        use gir::onnx::proto;
 
         let node = proto::NodeProto {
             op_type: "Where".to_owned(),
@@ -277,7 +285,7 @@ fn mlp_weights_are_extracted() {
 
     // W1 is (128, 784) F32 → 128 * 784 = 100_352 elements × 4 bytes.
     assert_eq!(w1_data.len(), 128 * 784);
-    assert_eq!(w1_data.dtype(), weaver_ir::dtype::DType::F32);
+    assert_eq!(w1_data.dtype(), gir::dtype::DType::F32);
     assert_eq!(w1_data.size_in_bytes(), 128 * 784 * 4);
 
     // Verify we can read the data back as f32.
@@ -307,5 +315,5 @@ fn convnet_conv_weights_extracted() {
         .expect("conv_w data missing");
 
     assert_eq!(data.len(), 8 * 1 * 3 * 3); // 72 elements
-    assert_eq!(data.dtype(), weaver_ir::dtype::DType::F32);
+    assert_eq!(data.dtype(), gir::dtype::DType::F32);
 }

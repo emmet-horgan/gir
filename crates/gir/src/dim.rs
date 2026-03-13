@@ -5,10 +5,10 @@
 //! or a linear combination of those.  This allows the IR to propagate shapes
 //! through the graph even when some input dimensions are only known at runtime.
 //!
-//! Internally, `DimExpr` wraps an [`AffineExpr`](weaver_affine::expr::AffineExpr)
+//! Internally, `DimExpr` wraps an [`AffineExpr`](gir_affine::expr::AffineExpr)
 //! numerator and a constant divisor, giving you canonical normalisation,
 //! deterministic equality, and direct interop with the constraint solver in
-//! `weaver-affine`.
+//! `gir-affine`.
 //!
 //! # Examples
 //!
