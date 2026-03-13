@@ -1,0 +1,12 @@
+[package]
+name = "gir-affine"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Affine integer algebra and constraint system for symbolic tensor dimension reasoning"
+
+[dependencies]
+serde = { version = "1.0.228", features = ["derive"] }
+
+[lints]
+workspace = true
